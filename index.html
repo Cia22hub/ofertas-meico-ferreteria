@@ -204,27 +204,26 @@
     let pestañaActiva = "ofertas";
     let marcaSeleccionada = "Todas";
 
-    async function cargarDatos() {
-      try {
-        const resp = await fetch(API_URL);
-        if (!resp.ok) throw new Error("Error en la API");
-        datosGlobales = await resp.json();
-      } catch (e) {
-        console.warn("Cargando datos de respaldo:", e);
-        datosGlobales = {
-          ofertas: [
-            { id: "1", url: "https://lh3.googleusercontent.com/d/1dOqfVuil4NQ1H8Cm6I06wiMKtpsXvErc", marca: "Legrand", producto: "Breakers Luminex", beneficio: "5% DCTO", resumen: "Por compra de 1 caja master x144 und" }
-          ],
-          escalas: [
-            { proveedor: "3M", colo1: "2% x $300 mil (49870)", colo2: "1.5% x $300 mil (49872)", condicion: "3% DCTO SOBRE INVENTARIO EN LINEA ELECTRICA", vigencia: "OCTUBRE 1 - OCTUBRE 31" },
-            { proveedor: "ABRACOL", colo1: "2% x $200 mil (28313)", colo2: "1% x $200 mil (28314)", condicion: "N/A", vigencia: "OCTUBRE 1 - OCTUBRE 31" }
-          ]
-        };
-      } finally {
-        renderizarFiltros();
-        filtrar();
+   async function cargarDatos() {
+    try {
+    const resp = await fetch(API_URL);
+    if (!resp.ok) throw new Error("Error en la API");
+    const data = await resp.json();
+    
+    // Si la API devuelve { ofertas: [...], escalas: [...] }
+     if (data.ofertas) {
+      datosGlobales = data;
+     } else if (Array.isArray(data)) {
+      // Si la API devuelve directamente la lista de ofertas
+      datosGlobales = { ofertas: data, escalas: [] };
+     }
+       } catch (e) {
+     console.warn("Error cargando API:", e);
+       } finally {
+     renderizarFiltros();
+     filtrar();
       }
-    }
+     }
 
     function cambiarPestaña(tab, btn) {
       pestañaActiva = tab;
