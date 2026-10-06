@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ofertas Ferretería | MEICO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #003366;
+      --accent: #0284c7;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --subtext: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { 
+      background: var(--primary); 
+      color: white; 
+      padding: 14px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
+    header span { font-size: 0.8rem; opacity: 0.85; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 20px 14px; }
+
+    .search-box { position: relative; margin-bottom: 16px; }
+    .search-box input { 
+      width: 100%; 
+      padding: 14px 16px 14px 42px; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 12px; 
+      font-size: 0.95rem; 
+      outline: none; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--subtext); width: 18px; height: 18px; }
+
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 20px; scrollbar-width: none; }
+    .filters::-webkit-scrollbar { display: none; }
+    .chip { 
+      padding: 8px 18px; 
+      background: #e2e8f0; 
+      border: none; 
+      border-radius: 20px; 
+      font-weight: 600; 
+      font-size: 0.85rem; 
+      cursor: pointer; 
+      color: var(--text);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .chip.active { background: var(--primary); color: white; }
+
+    .grid { display: flex; flex-direction: column; gap: 24px; }
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      overflow: hidden; 
+      border: 1px solid #e2e8f0; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      transition: transform 0.2s;
+    }
+    .card-img-container { 
+      position: relative; 
+      width: 100%; 
+      background: #f1f5f9; 
+      cursor: pointer; 
+      overflow: hidden; 
+    }
+    .card img { width: 100%; height: auto; display: block; object-fit: contain; }
+    .card-body { padding: 16px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+    .brand { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; }
+    .date { color: var(--subtext); font-weight: 600; }
+    .card-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .card-desc { font-size: 0.88rem; color: var(--subtext); line-height: 1.45; }
+
+    #loader { text-align: center; padding: 40px 20px; color: var(--subtext); }
+    .spinner { width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
+    .modal img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+    .modal-close { position: absolute; top: 15px; right: 20px; color: white; font-size: 30px; font-weight: bold; cursor: pointer; }
+
+    footer { text-align: center; font-size: 0.8rem; color: var(--subtext); margin-top: 40px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>MEICO</h1>
+      <span>Canal Ferretero</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="search-box">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Buscar por producto, marca (DeWalt, Legrand...)" oninput="filtrar()">
+    </div>
+
+    <div class="filters" id="brandFilters">
+      <button class="chip active" onclick="filtrarMarca('Todas', this)">Todas</button>
+    </div>
+
+    <div id="loader">
+      <div class="spinner"></div>
+      <p>Cargando catálogo actualizado de ferretería...</p>
+    </div>
+
+    <div class="grid" id="ofertasGrid"></div>
+  </main>
+
+  <div class="modal" id="imageModal" onclick="cerrarModal()">
+    <span class="modal-close">&times;</span>
+    <img id="modalImg" src="" alt="Ampliación de la oferta">
+  </div>
+
+  <footer>
+    Desarrollado con precisión para MEICO por <strong>Lucía Vélez</strong>
+  </footer>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw1rNfj9JQMqWYhtbUNGgpUsJwSApoKodUrEE77N14OHEBjhBWf_KW4dkA6E043nM3QCA/exec";
+
+    let datasetGlobal = [];
+    let marcaSeleccionada = "Todas";
+
+    async function obtenerDatos() {
+      const loader = document.getElementById('loader');
+
+      try {
+        const resp = await fetch(API_URL);
+        if (!resp.ok) throw new Error("Error obteniendo datos");
+        datasetGlobal = await resp.json();
+      } catch (e) {
+        console.warn("Usando datos locales de respaldo:", e);
+        datasetGlobal = [
+          {
+            id: "1",
+            url: "https://lh3.googleusercontent.com/d/1dOqfVuil4NQ1H8Cm6I06wiMKtpsXvErc",
+            marca: "Legrand",
+            producto: "Breakers Luminex Monopolares DSE 15-40 AMP",
+            vigencia: "Octubre",
+            resumen: "Por compra de 1 caja master x144 und obtén 5% de descuento. Segmento Ferretería General."
+          }
+        ];
+      } finally {
+        loader.style.display = 'none';
+        renderizarFiltros();
+        filtrar();
+      }
+    }
+
+    function renderizarFiltros() {
+      const contenedor = document.getElementById('brandFilters');
+      const marcasUnicas = ["Todas", ...new Set(datasetGlobal.map(item => item.marca))];
+      
+      contenedor.innerHTML = marcasUnicas.map(m => 
+        `<button class="chip ${m === marcaSeleccionada ? 'active' : ''}" onclick="filtrarMarca('${m}', this)">${m}</button>`
+      ).join('');
+    }
+
+    function renderizarTarjetas(lista) {
+      const grid = document.getElementById('ofertasGrid');
+      if (lista.length === 0) {
+        grid.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">No se encontraron promociones que coincidan con tu búsqueda.</div>';
+        return;
+      }
+
+      grid.innerHTML = lista.map(item => `
+        <article class="card">
+          <div class="card-img-container" onclick="abrirModal('${item.url}')">
+            <img src="${item.url}" alt="${item.producto}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500?text=Imagen+Promocional'">
+          </div>
+          <div class="card-body">
+            <div class="card-header">
+              <span class="brand">${item.marca}</span>
+              <span class="date">${item.vigencia}</span>
+            </div>
+            <h2 class="card-title">${item.producto}</h2>
+            <p class="card-desc">${item.resumen}</p>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function filtrarMarca(marca, btn) {
+      marcaSeleccionada = marca;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      filtrar();
+    }
+
+    function filtrar() {
+      const texto = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtrados = datasetGlobal.filter(item => {
+        const coincideMarca = marcaSeleccionada === "Todas" || item.marca.toLowerCase() === marcaSeleccionada.toLowerCase();
+        const coincideTexto = item.producto.toLowerCase().includes(texto) || 
+                              item.marca.toLowerCase().includes(texto) || 
+                              item.resumen.toLowerCase().includes(texto) ||
+                              item.vigencia.toLowerCase().includes(texto);
+        return coincideMarca && coincideTexto;
+      });
+      renderizarTarjetas(filtrados);
+    }
+
+    function abrirModal(url) {
+      document.getElementById('modalImg').src = url;
+      document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+
+    obtenerDatos();
+  </script>
+</body>
+</html>
