@@ -123,13 +123,19 @@ tr:last-child td{border-bottom:none}
   let dataset = { ofertas: [], escalas: [] };
   let currentTab = "ofertas";
 
-  async function cargarDatos() {
+async function cargarDatos() {
+    const cont = document.getElementById("offersContainer");
+    cont.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px;">Cargando ofertas en tiempo real...</p>';
+
     try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error("Error en la respuesta");
+      // redirect: "follow" permite que el navegador siga la redirección de Google Apps Script sin trabarse
+      const res = await fetch(API_URL, { method: 'GET', redirect: 'follow' });
+      if (!res.ok) throw new Error("Error en la respuesta del servidor: " + res.status);
       dataset = await res.json();
+      console.log("Datos recibidos con éxito:", dataset);
     } catch (e) {
-      console.warn("Error consultando la API:", e);
+      console.error("Error consultando la API:", e);
+      cont.innerHTML = '<p style="text-align:center;color:red;padding:30px;">Error al conectar con la API. Revisa la consola (F12).</p>';
     } finally {
       filtrar();
     }
