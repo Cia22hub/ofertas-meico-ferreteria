@@ -10,74 +10,121 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .bg-meico { background-color: #063b83; }
         .text-meico { color: #063b83; }
-        .border-meico { border-color: #063b83; }
     </style>
 </head>
 <body>
 
-    <!-- Header con el Azul de MEICO -->
     <header class="bg-meico shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-white text-meico p-2 rounded-lg font-bold text-xl shadow-inner">M</div>
                 <div>
-                    <h1 class="text-xl font-bold text-white leading-tight">MEICO</h1>
-                    <p class="text-blue-200 text-xs font-bold tracking-widest uppercase italic">Occidente</p>
+                    <h1 class="text-xl font-bold text-white leading-tight uppercase tracking-tighter">MEICO</h1>
+                    <p class="text-blue-200 text-[10px] font-bold tracking-[0.2em] uppercase italic">Occidente</p>
                 </div>
             </div>
-            <!-- Buscador para agilidad del asesor -->
             <div class="relative w-full md:w-96">
-                <input type="text" id="search" placeholder="Buscar producto o escala..." 
-                       class="w-full pl-10 pr-4 py-2 rounded-xl border-none focus:ring-4 focus:ring-blue-400 outline-none transition-all shadow-lg text-slate-700">
+                <input type="text" id="search" placeholder="Buscar producto o marca..." 
+                       class="w-full pl-10 pr-4 py-2 rounded-xl border-none focus:ring-4 focus:ring-blue-400 outline-none shadow-lg text-slate-700">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Indicador de Carga -->
-        <div id="loader" class="flex flex-col items-center justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white border-t-meico"></div>
-            <p class="mt-4 text-slate-600 font-medium italic">Sincronizando ofertas con Drive...</p>
+        <!-- Loader que se oculta si hay éxito o error -->
+        <div id="loader" class="flex flex-col items-center justify-center py-20 transition-opacity duration-500">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-meico"></div>
+            <p class="mt-4 text-slate-500 font-medium italic">Sincronizando ofertas...</p>
         </div>
 
-        <!-- Grid de Ofertas -->
         <div id="grid-ofertas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </main>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWQpWZYqxgYAWQ6vTbOqW0-ewZ6VGkXq63sRgh2nmXe3MTyqMFZFOGPduRIdzQcXt6jQ/exec";
+        // TU URL DE APPS SCRIPT
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWQpWZYqgYAWQ6vTbOqW0-ewZ6VGkXq63sRgh2nmXe3MTyqMFZFOGPduRIdzQcXt6jQ/exec";
 
         async function fetchOfertas() {
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('grid-ofertas');
+
             try {
                 const response = await fetch(WEB_APP_URL);
-                const rawData = await response.json();
+                const data = await response.json();
                 
-                // Limpiar nombres de columnas (quitar espacios y tildes)
-                const data = rawData.map(item => {
-                    const newItem = {};
-                    for (let key in item) {
-                        const cleanKey = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-                        newItem[cleanKey] = item[key];
-                    }
-                    return newItem;
-                });
+                if (!Array.isArray(data)) {
+                    throw new Error("Los datos no tienen el formato correcto");
+                }
 
-                renderOfertas(data);
+                // Renderizar
+                if (data.length === 0) {
+                    loader.innerHTML = `<p class="text-slate-500">No hay ofertas cargadas en el Excel.</p>`;
+                } else {
+                    renderOfertas(data);
+                    loader.style.display = 'none'; // Ocultar loader
+                }
+
             } catch (error) {
-                console.error(error);
-                document.getElementById('loader').innerHTML = `<p class="text-red-500">Error al conectar con los datos.</p>`;
+                console.error("Error:", error);
+                loader.innerHTML = `
+                    <div class="text-center p-8 bg-white rounded-2xl shadow-sm border border-red-100">
+                        <p class="text-red-500 font-bold text-lg">⚠️ No se pudieron cargar los datos</p>
+                        <p class="text-slate-400 text-sm mt-2">Revisa que el Excel no esté vacío y que el Script sea público.</p>
+                        <button onclick="location.reload()" class="mt-4 bg-meico text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Reintentar</button>
+                    </div>
+                `;
             }
         }
 
         function renderOfertas(ofertas) {
             const grid = document.getElementById('grid-ofertas');
-            const loader = document.getElementById('loader');
             
-            grid.innerHTML = ofertas.map(item => `
-                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden hover:border-blue-400 transition-all duration-300 flex flex-col">
-                    <!-- Imagen del Producto -->
-                    <div class="h-52 bg-slate-100 overflow-hidden relative">
-                        <img src="${item.imagen_id ? 'https://lh3.googleusercontent.com/d/' + item.imagen_id : 'https://via.placeholder.com/400x300?text=SIN+IMAGEN'}" 
-                             class="w-full h-full object-contain p-2" 
-                             alt="${item.t
+            grid.innerHTML = ofertas.map(item => {
+                // Buscamos las propiedades sin importar si son Mayus o Minus
+                const titulo = item.titulo || item.Titulo || item.TITULO || "Producto sin nombre";
+                const desc = item.descripcion || item.Descripcion || item.DESCRIPCION || "Ver escalas con el asesor.";
+                const imgId = item.imagen_id || item.Imagen_ID || item.IMAGEN_ID || "";
+
+                return `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col group">
+                    <div class="h-52 bg-white overflow-hidden relative border-b border-slate-50">
+                        <img src="${imgId ? 'https://lh3.googleusercontent.com/d/' + imgId : 'https://via.placeholder.com/400x300?text=MEICO+OFERTA'}" 
+                             class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                             alt="Oferta">
+                        <div class="absolute top-3 left-3 bg-meico text-white text-[9px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-tighter">Oferta del Mes</div>
+                    </div>
+
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 class="font-bold text-meico text-md leading-tight mb-3 uppercase tracking-tight">
+                            ${titulo}
+                        </h3>
+                        <div class="text-slate-600 text-sm whitespace-pre-line leading-relaxed mb-4 flex-grow font-medium">
+                            ${desc}
+                        </div>
+                        <div class="mt-auto pt-3 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-[9px] font-bold text-slate-300 uppercase tracking-[0.1em]">Meico Occidente</span>
+                            <div class="flex gap-1">
+                                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                <span class="text-[9px] font-bold text-green-500 uppercase tracking-widest text-right">Disponible</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Buscador ágil
+        document.getElementById('search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('#grid-ofertas > div');
+            cards.forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+
+        window.onload = fetchOfertas;
+    </script>
+</body>
+</html>
