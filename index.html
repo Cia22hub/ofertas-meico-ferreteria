@@ -6,93 +6,72 @@
     <title>MEICO | Escalas Vigentes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .bg-meico { background-color: #063b83; }
-        .text-meico { color: #063b83; }
-    </style>
 </head>
-<body>
+<body class="bg-slate-100 font-['Inter']">
 
-    <header class="bg-meico shadow-xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <header class="bg-[#063b83] shadow-xl sticky top-0 z-50 py-4 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-white text-meico p-2 rounded-lg font-bold text-xl shadow-md">M</div>
+                <div class="bg-white text-[#063b83] p-2 rounded-lg font-bold text-xl">M</div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-white leading-tight tracking-tighter">MEICO OCCIDENTE</h1>
-                    <p class="text-blue-300 text-[10px] font-bold tracking-[0.2em] uppercase">Escalas de Aliados</p>
+                    <h1 class="text-white font-black text-xl tracking-tighter">MEICO OCCIDENTE</h1>
+                    <p class="text-blue-300 text-[10px] font-bold uppercase tracking-widest">Escalas de Aliados</p>
                 </div>
             </div>
-            <div class="relative w-full md:w-96">
-                <input type="text" id="search" placeholder="Buscar proveedor (ej: 3M, Yale...)" 
-                       class="w-full pl-10 pr-4 py-3 rounded-2xl border-none focus:ring-4 focus:ring-blue-500 outline-none shadow-lg text-slate-700 font-medium">
-                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
+            <input type="text" id="search" placeholder="Buscar proveedor..." 
+                   class="w-full md:w-80 px-4 py-2 rounded-xl outline-none focus:ring-4 focus:ring-blue-400">
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <div id="loader" class="flex flex-col items-center justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-meico"></div>
-            <p class="mt-4 text-slate-500 font-bold animate-pulse">Sincronizando con Excel...</p>
-        </div>
-
-        <div id="grid-ofertas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <main class="max-w-6xl mx-auto p-6">
+        <div id="loader" class="text-center py-20 text-slate-500 font-bold animate-pulse">Sincronizando con Excel...</div>
+        <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx7aaRlTw3oUHhBUEZ82TnsGxa3THg63nrK5kQPs_Fu0XdxBmuEit8WCz4Q1Pchz4TfuA/exec"; // REEMPLAZA ESTO
+        // PEGA AQUÍ TU NUEVO LINK DE APPS SCRIPT
+        const URL = "https://script.google.com/macros/s/AKfycbxI2r4wZBCurS-XAqbbIqWO9oaDeoITa7r5f51G93yhDBfcw3tnlzcLrXIJFiyql1gctQ/exec";
 
-        async function fetchOfertas() {
+        async function cargar() {
             try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                renderOfertas(data);
-                document.getElementById('loader').style.display = 'none';
-            } catch (error) {
-                document.getElementById('loader').innerHTML = `<p class="text-red-500 font-bold">⚠️ Error de conexión: Verifica el nombre de la pestaña "Septiembre"</p>`;
+                const res = await fetch(URL);
+                const data = await res.json();
+                if(data.error) throw new Error();
+                
+                document.getElementById('grid').innerHTML = data.map(item => `
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl transition-all">
+                        <h3 class="text-[#063b83] font-black text-xl uppercase border-b pb-2 mb-4 italic">${item.proveedor}</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4 text-center">
+                            <div class="bg-yellow-50 p-2 rounded-xl border border-yellow-200">
+                                <span class="text-[9px] font-bold text-yellow-600 block uppercase italic">Escala 1</span>
+                                <span class="text-xs font-bold text-slate-700">${item.escala1 || '-'}</span>
+                            </div>
+                            <div class="bg-blue-50 p-2 rounded-xl border border-blue-200">
+                                <span class="text-[9px] font-bold text-blue-600 block uppercase italic">Escala 2</span>
+                                <span class="text-xs font-bold text-slate-700">${item.escala2 || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl text-white text-[11px] leading-relaxed italic">
+                            <span class="text-blue-300 font-bold uppercase block mb-1">Condiciones:</span>
+                            ${item.condiciones || 'Sin descuentos adicionales'}
+                        </div>
+                        <p class="text-[9px] text-slate-400 font-bold mt-4 uppercase text-right tracking-widest">${item.vigencia || ''}</p>
+                    </div>
+                `).join('');
+                document.getElementById('loader').classList.add('hidden');
+            } catch (e) {
+                document.getElementById('loader').innerHTML = "❌ Error de conexión. Revisa que el Script sea público.";
             }
         }
 
-        function renderOfertas(ofertas) {
-            const grid = document.getElementById('grid-ofertas');
-            grid.innerHTML = ofertas.map(item => `
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
-                    <div class="p-6 bg-slate-50 border-b border-slate-100">
-                        <h3 class="font-black text-meico text-xl uppercase tracking-tighter">${item.proveedor}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">${item.vigencia || 'Vigencia Octubre'}</p>
-                    </div>
-
-                    <div class="p-6 space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-yellow-50 p-3 rounded-2xl border border-yellow-100">
-                                <p class="text-[9px] font-black text-yellow-600 uppercase mb-1 text-center italic">Escala 1</p>
-                                <p class="text-xs font-bold text-slate-700 text-center">${item.colo1 || 'N/A'}</p>
-                            </div>
-                            <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100">
-                                <p class="text-[9px] font-black text-blue-600 uppercase mb-1 text-center italic">Escala 2</p>
-                                <p class="text-xs font-bold text-slate-700 text-center">${item.colo2 || 'N/A'}</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-800 p-4 rounded-2xl">
-                            <p class="text-[9px] font-black text-blue-300 uppercase mb-2 tracking-widest">Condiciones Adicionales:</p>
-                            <p class="text-white text-xs leading-relaxed font-medium italic">${item.descuentos || 'Sin descuentos adicionales.'}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         document.getElementById('search').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('#grid-ofertas > div').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+            const t = e.target.value.toLowerCase();
+            document.querySelectorAll('#grid > div').forEach(c => {
+                c.style.display = c.innerText.toLowerCase().includes(t) ? 'block' : 'none';
             });
         });
 
-        window.onload = fetchOfertas;
+        window.onload = cargar;
     </script>
 </body>
 </html>
