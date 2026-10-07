@@ -5,70 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEICO | Escalas Vigentes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-100 font-['Inter']">
+<body class="bg-slate-50 font-['Inter']">
 
-    <header class="bg-[#063b83] shadow-xl sticky top-0 z-50 py-4 px-4">
+    <header class="bg-[#063b83] shadow-xl sticky top-0 z-50 py-4 px-6">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-white text-[#063b83] p-2 rounded-lg font-bold text-xl">M</div>
-                <div>
-                    <h1 class="text-white font-black text-xl tracking-tighter">MEICO OCCIDENTE</h1>
-                    <p class="text-blue-300 text-[10px] font-bold uppercase tracking-widest">Escalas de Aliados</p>
-                </div>
+                <h1 class="text-white font-black text-xl tracking-tighter uppercase">Meico Occidente</h1>
             </div>
-            <input type="text" id="search" placeholder="Buscar proveedor..." 
-                   class="w-full md:w-80 px-4 py-2 rounded-xl outline-none focus:ring-4 focus:ring-blue-400">
+            <input type="text" id="search" placeholder="🔎 Buscar proveedor..." 
+                   class="w-full md:w-80 px-4 py-2 rounded-2xl outline-none border-none shadow-inner text-slate-700">
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto p-6">
-        <div id="loader" class="text-center py-20 text-slate-500 font-bold animate-pulse">Sincronizando con Excel...</div>
+        <div id="loader" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-[#063b83] mb-4"></div>
+            <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">Cargando Escalas...</p>
+        </div>
+
         <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        
+        <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+            <p class="text-slate-400 font-medium">No se encontraron proveedores con ese nombre.</p>
+        </div>
     </main>
 
     <script>
-        // PEGA AQUÍ TU NUEVO LINK DE APPS SCRIPT
+        // PEGA AQUÍ TU NUEVO ENLACE (DEBE TERMINAR EN /exec)
         const URL = "https://script.google.com/macros/s/AKfycbybdH9zb-rt6oZMqhFvv2Bg3hvWPdFjkZuV4rZUjXYrmG5DMwOmQZ7XtEourVOHXT0U0Q/exec";
 
         async function cargar() {
+            const grid = document.getElementById('grid');
+            const loader = document.getElementById('loader');
+
             try {
                 const res = await fetch(URL);
                 const data = await res.json();
-                if(data.error) throw new Error();
                 
-                document.getElementById('grid').innerHTML = data.map(item => `
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl transition-all">
-                        <h3 class="text-[#063b83] font-black text-xl uppercase border-b pb-2 mb-4 italic">${item.proveedor}</h3>
-                        <div class="grid grid-cols-2 gap-2 mb-4 text-center">
-                            <div class="bg-yellow-50 p-2 rounded-xl border border-yellow-200">
-                                <span class="text-[9px] font-bold text-yellow-600 block uppercase italic">Escala 1</span>
-                                <span class="text-xs font-bold text-slate-700">${item.escala1 || '-'}</span>
+                if(!data || data.length === 0) {
+                    loader.innerHTML = "⚠️ El Excel parece estar vacío en las filas de datos.";
+                    return;
+                }
+
+                grid.innerHTML = data.map(item => `
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition-all flex flex-col">
+                        <div class="p-6 bg-slate-50 border-b border-slate-100">
+                            <h3 class="text-[#063b83] font-black text-xl uppercase italic tracking-tighter">${item.proveedor}</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-widest">${item.vigencia}</p>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-orange-50 p-3 rounded-2xl border border-orange-100 text-center">
+                                    <span class="text-[9px] font-bold text-orange-600 block uppercase italic">Escala 1</span>
+                                    <span class="text-xs font-black text-slate-800">${item.escala1}</span>
+                                </div>
+                                <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 text-center">
+                                    <span class="text-[9px] font-bold text-blue-600 block uppercase italic">Escala 2</span>
+                                    <span class="text-xs font-black text-slate-800">${item.escala2}</span>
+                                </div>
                             </div>
-                            <div class="bg-blue-50 p-2 rounded-xl border border-blue-200">
-                                <span class="text-[9px] font-bold text-blue-600 block uppercase italic">Escala 2</span>
-                                <span class="text-xs font-bold text-slate-700">${item.escala2 || '-'}</span>
+                            <div class="bg-slate-800 p-4 rounded-2xl">
+                                <span class="text-blue-300 font-bold text-[9px] uppercase block mb-1 tracking-widest">Descuentos y Condiciones:</span>
+                                <p class="text-white text-[11px] leading-relaxed italic font-medium">${item.condiciones}</p>
                             </div>
                         </div>
-                        <div class="bg-slate-800 p-4 rounded-xl text-white text-[11px] leading-relaxed italic">
-                            <span class="text-blue-300 font-bold uppercase block mb-1">Condiciones:</span>
-                            ${item.condiciones || 'Sin descuentos adicionales'}
-                        </div>
-                        <p class="text-[9px] text-slate-400 font-bold mt-4 uppercase text-right tracking-widest">${item.vigencia || ''}</p>
                     </div>
                 `).join('');
-                document.getElementById('loader').classList.add('hidden');
+                loader.style.display = 'none';
             } catch (e) {
-                document.getElementById('loader').innerHTML = "❌ Error de conexión. Revisa que el Script sea público.";
+                loader.innerHTML = "❌ Error al leer el Excel. Verifica que el Script sea público.";
             }
         }
 
         document.getElementById('search').addEventListener('input', (e) => {
             const t = e.target.value.toLowerCase();
+            let hasResults = false;
             document.querySelectorAll('#grid > div').forEach(c => {
-                c.style.display = c.innerText.toLowerCase().includes(t) ? 'block' : 'none';
+                const match = c.innerText.toLowerCase().includes(t);
+                c.style.display = match ? 'flex' : 'none';
+                if(match) hasResults = true;
             });
+            document.getElementById('empty-state').classList.toggle('hidden', hasResults);
         });
 
         window.onload = cargar;
