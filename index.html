@@ -35,75 +35,34 @@ header p{font-size:0.8rem;opacity:0.85;margin-top:2px}
 
 .main-container{max-width:1100px;margin:0 auto;padding:20px 16px}
 
-/* FILA 1: BOTONES DE CATEGORÍAS */
-.category-bar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:18px;
-}
+/* FILA 1: CATEGORÍAS */
+.category-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
 .btn-cat{
-  padding:10px 18px;
-  border-radius:10px;
-  font-size:0.9rem;
-  font-weight:700;
-  cursor:pointer;
-  background:#ffffff;
-  border:1px solid #94a3b8;
-  color:#0f172a;
-  transition:all 0.2s ease;
+  padding:10px 18px;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;
+  background:#ffffff;border:1px solid #94a3b8;color:#0f172a;transition:all 0.2s ease;
 }
 .btn-cat:hover{background:#f1f5f9}
-.btn-cat.active{
-  background:var(--yellow-main);
-  border-color:var(--yellow-border);
-  color:#000;
-  box-shadow:0 2px 4px rgba(0,0,0,0.06);
-}
+.btn-cat.active{background:var(--yellow-main);border-color:var(--yellow-border);color:#000}
 .btn-cat.cat-vencer{border-color:#d97706;color:#92400e}
 .btn-cat.cat-inminente{border-color:#2563eb;color:#1e40af}
 .btn-cat.cat-exceso{border-color:#dc2626;color:#b91c1c}
 
-/* FILA 2: PÍLDORAS DE MARCAS */
-.brand-pills-bar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:20px;
-}
+/* FILA 2: PÍLDORAS */
+.brand-pills-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .pill{
-  padding:8px 18px;
-  border-radius:24px;
-  font-size:0.85rem;
-  font-weight:700;
-  cursor:pointer;
-  background:#ffffff;
-  border:1px solid #cbd5e1;
-  color:#0f172a;
-  transition:all 0.15s ease;
-  white-space:nowrap;
+  padding:8px 18px;border-radius:24px;font-size:0.85rem;font-weight:700;cursor:pointer;
+  background:#ffffff;border:1px solid #cbd5e1;color:#0f172a;white-space:nowrap;
 }
 .pill:hover{border-color:#64748b;background:#f8fafc}
-.pill.active{
-  background:var(--blue);
-  color:#ffffff;
-  border-color:var(--blue);
-  box-shadow:0 2px 6px rgba(0,51,102,0.2);
-}
+.pill.active{background:var(--blue);color:#ffffff;border-color:var(--blue)}
 
 /* BUSCADOR */
 .search-box{position:relative;margin-bottom:20px}
 .search-input{
-  width:100%;
-  padding:14px 18px;
-  background:#ffffff;
-  border:1px solid var(--border);
-  border-radius:12px;
-  font-size:0.95rem;
-  outline:none;
-  box-shadow:0 1px 3px rgba(0,0,0,0.02);
+  width:100%;padding:14px 18px;background:#ffffff;border:1px solid var(--border);
+  border-radius:12px;font-size:0.95rem;outline:none;
 }
-.search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,51,102,0.12)}
+.search-input:focus{border-color:var(--blue)}
 
 /* VISTAS */
 .view-section{display:none}
@@ -111,18 +70,11 @@ header p{font-size:0.8rem;opacity:0.85;margin-top:2px}
 
 /* GRID DE OFERTAS */
 .grid-cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
-  gap:20px;
+  display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:20px;
 }
 .card{
-  background:var(--card-bg);
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 4px 12px rgba(0,0,0,0.03);
-  display:flex;
-  flex-direction:column;
+  background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.03);display:flex;flex-direction:column;
 }
 .card-media{position:relative;background:#f1f5f9;cursor:pointer}
 .card-media img{width:100%;height:auto;display:block;aspect-ratio:4/3;object-fit:cover}
@@ -131,11 +83,109 @@ header p{font-size:0.8rem;opacity:0.85;margin-top:2px}
 .card-body{padding:16px;flex:1;display:flex;flex-direction:column}
 .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .brand-badge{background:#e0f2fe;color:#0369a1;padding:3px 10px;border-radius:6px;font-weight:700;font-size:0.8rem}
-.offer-badge{background:#ecfdf5;color:#059669;padding:3px 10px;border-radius:6px;font-weight:800;font-size:0.8rem;letter-spacing:0.5px}
+.offer-badge{background:#ecfdf5;color:#059669;padding:3px 10px;border-radius:6px;font-weight:800;font-size:0.8rem}
 
 .card-categoria{font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:4px}
 .card-promo{font-size:1.2rem;font-weight:800;color:var(--blue);margin-bottom:6px;line-height:1.3}
 .card-detalle{font-size:0.85rem;color:var(--muted);line-height:1.4;margin:0}
 
-/* TABLA DE ESCALAS */
-.table-wrap{
+/* TABLA ESCALAS */
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:0.88rem;text-align:left}
+th{background:#f1f5f9;color:var(--blue);padding:12px 14px;font-weight:700;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;justify-content:center;align-items:center;padding:16px}
+.modal img{max-width:100%;max-height:90vh;border-radius:8px}
+.modal-close{position:absolute;top:20px;right:20px;color:#fff;font-size:32px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ofertas Comerciales | MEICO Occidente</h1>
+  <p>Catálogo Digital de Promociones y Escalas</p>
+</header>
+
+<main class="main-container">
+  
+  <div class="category-bar">
+    <button class="btn-cat active" onclick="seleccionarCategoria('Todo', this)">Todo</button>
+    <button class="btn-cat" onclick="seleccionarCategoria('Aniversario', this)">Aniversario</button>
+    <button class="btn-cat" onclick="seleccionarCategoria('Ofertas', this)">Ofertas</button>
+    <button class="btn-cat" onclick="seleccionarCategoria('Escalas', this)">Escalas</button>
+    <button class="btn-cat cat-vencer" onclick="seleccionarCategoria('Próximos a vencer', this)">Próximos a vencer</button>
+    <button class="btn-cat cat-inminente" onclick="seleccionarCategoria('Inminentes exceso', this)">Inminentes exceso</button>
+    <button class="btn-cat cat-exceso" onclick="seleccionarCategoria('Exceso inventario', this)">Exceso inventario</button>
+  </div>
+
+  <div class="brand-pills-bar" id="pillsBar"></div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por producto, marca, regla o condición..." oninput="filtrar()">
+  </div>
+
+  <section id="vistaOfertas" class="view-section active">
+    <div class="grid-cards" id="offersContainer">
+      <p style="text-align:center;color:var(--muted);padding:30px;grid-column:1/-1;">Cargando catálogo...</p>
+    </div>
+  </section>
+
+  <section id="vistaEscalas" class="view-section">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>Colo. 1</th>
+            <th>Colo. 2</th>
+            <th>Condiciones</th>
+            <th>Vigencia</th>
+          </tr>
+        </thead>
+        <tbody id="escalasContainer">
+          <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Cargando escalas...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal" id="modal" onclick="cerrarModal()">
+  <span class="modal-close">&times;</span>
+  <img id="modalImg" src="" alt="Ampliación">
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbzXbWQ6byGnF7ONqDe-0uTbNq9Qfwd5oI5Q1mFo3SLsw8tr_-oiRtb-CIFP0K_1Jec-3A/exec";
+
+  let dataset = { ofertas: [], escalas: [] };
+  let categoriaActiva = "Todo";
+  let marcaActiva = "Todas";
+
+  const marcasPredefinidas = [
+    "Todas", "3M", "Abracol", "Accel", "Alumina (EMMA) Perfilería", "Aniversario", 
+    "Artecola", "Assa Abloy", "Atlantis", "Ave Colombiana", "Black & Decker", 
+    "C.A. Mejía", "Celta", "Centelsa", "Clientes nuevos", "Colcadenas", 
+    "DeWalt", "DeWalt / Stanley / Black & Decker", "Fanes", "Fullwat", 
+    "Ideace", "Induma", "Irwin", "ITW", "Legrand", "Lhaura", "Masso", 
+    "Pegatex Artecola", "Productos Químicos Andinos", "Simoniz", 
+    "Soldaduras West Arco", "Soldaduras West Arco S.A.S. (Equipos)", 
+    "Stanley", "Stanley Herramienta Manual", "Tercol", "Tesicol"
+  ];
+
+  function renderizarPildoras() {
+    const contenedor = document.getElementById("pillsBar");
+    if (!contenedor) return;
+
+    let setMarcas = new Set(marcasPredefinidas);
+    if (dataset.ofertas && Array.isArray(dataset.ofertas)) {
+      dataset.ofertas.forEach(o => { if (o.marca) setMarcas.add(o.marca); });
+    }
+    if (dataset.escalas && Array.isArray(dataset.escalas)) {
+      dataset.escalas.forEach(e => { if (e.proveedor) setMarcas.add(e.proveedor); });
+    }
+
+    const listaFinal = Array.from(setMarcas);
